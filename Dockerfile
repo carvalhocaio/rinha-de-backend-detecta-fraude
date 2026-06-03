@@ -1,7 +1,7 @@
 # =========== builder ==============
-FROM python:3-13-slim AS builder
+FROM python:3.13-slim AS builder
 
-COPY --from=ghrc.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV UV_PYTHON_PREFERENCE=only-system \
     UV_PYTHON_DOWNLOADS=never
@@ -20,16 +20,16 @@ FROM python:3.13-slim AS runtime
 WORKDIR /app
 
 ENV MALLOC_ARENA_MAX=2 \
-    PYTHODONTWRITEBYTECODE=1 \
-    PYTHONBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/src /app/src
 
 COPY --from=builder /app/data /app/data
-COPY --from=builder /app/resource/normalization.json /app/resource/normalization.json
-COPY --from=builder /app/resource/mcc_risk.json /app/resources/mcc_risk.json
+COPY --from=builder /app/resources/normalization.json /app/resources/normalization.json
+COPY --from=builder /app/resources/mcc_risk.json /app/resources/mcc_risk.json
 
 EXPOSE 9999
 

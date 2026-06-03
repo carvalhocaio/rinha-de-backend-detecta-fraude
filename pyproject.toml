@@ -9,7 +9,6 @@ dependencies = [
     "litestar>=2.0",
     "msgspec>=0.18",
     "numpy>=2.0",
-    "hnswlib>=0.8",
 ]
 
 [dependency-groups]

@@ -11,7 +11,7 @@ import numpy as np
 class Transaction(msgspec.Struct):
     amount: float
     installments: int
-    request_at: str
+    requested_at: str
 
 
 class Customer(msgspec.Struct):
@@ -78,7 +78,7 @@ def _parse_ts(ts: str) -> datetime:
 def vectorize(req: FraudRequest) -> np.ndarray:
     """Monta o vetor de 14 dimensões na ORDEM da especificação."""
     t, c, m, term = req.transaction, req.customer, req.merchant, req.terminal
-    requested = _parse_ts(t.request_at)
+    requested = _parse_ts(t.requested_at)
 
     if req.last_transaction is not None:
         minutes = (

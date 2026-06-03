@@ -27,7 +27,7 @@ def ready() -> str:
     return "ok"
 
 
-@post("/fraud-score", media_type=MediaType.JSON, sync_to_thread=True)
+@post("/fraud-score", media_type=MediaType.JSON, sync_to_thread=False)
 def fraud_score(data: FraudRequest) -> Response[bytes]:
     try:
         query = vectorize(data)

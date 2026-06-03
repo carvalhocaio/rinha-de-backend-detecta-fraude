@@ -1,35 +1,38 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
+import faiss
 import numpy as np
 
-DATA = Path("data")
+_ROOT = Path(__file__).resolve().parent.parent
+DATA = _ROOT / "data"
 
 
 class VectorIndex:
-    """Busca por força bruta dos k vizinhos mais próximos (k-NN exato, distância L2)."""
+    """Busca aproximada dos k vizinhos mais próximos via índice FAISS IVF."""
 
     def __init__(
         self,
-        vectors_path: Path = DATA / "vectors.f16.npy",
+        index_path: Path = DATA / "index.faiss",
         labels_path: Path = DATA / "labels.u8.npy",
+        nprobe: int | None = None,
     ) -> None:
-        self.vectors = np.load(vectors_path, mmap_mode="r")
+        self.index = faiss.read_index(str(index_path), faiss.IO_FLAG_MMAP)
+        self.nprobe = int(
+            nprobe if nprobe is not None else os.environ.get("FAISS_NPROBE", 16)
+        )
+
         self.labels = np.load(labels_path, mmap_mode="r")
-        self.n = self.vectors.shape[0]
+        self.n = self.index.ntotal
 
-    def knn(self, query: np.ndarray, k: int = 5, chunk: int = 261_144) -> np.ndarray:
-        """índices dos k vetores de referência mais próximos (sem ordem garantida)."""
-        dist_sq = np.empty(self.n, dtype=np.float32)
-
-        for start in range(0, self.n, chunk):
-            end = min(start + chunk, self.n)
-            block = self.vectors[start:end].astype(np.float32)
-            diff = block - query
-            dist_sq[start:end] = np.einsum("ij,ij->i", diff, diff)
-
-        return np.argpartition(dist_sq, k)[:k]
+    def knn(self, query: np.ndarray, k: int = 5) -> np.ndarray:
+        """Índices dos k vizinhos mais próximos (aproximados)."""
+        q = np.ascontiguousarray(query.reshape(1, -1), dtype=np.float32)
+        _, idx = self.index.search(q, k)
+        idx = idx[0]
+        return idx[idx >= 0]
 
     def score(self, query: np.ndarray, k: int = 5) -> tuple[float, bool]:
         """Retorna (fraud_score, approved) seguindo a regra da Rinha."""

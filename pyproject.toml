@@ -5,6 +5,7 @@ description = "Submissão Python para a Rinha de Backend 2026 (detecção de fra
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "faiss-cpu>=1.14.2",
     "granian>=2.0",
     "litestar>=2.0",
     "msgspec>=0.18",

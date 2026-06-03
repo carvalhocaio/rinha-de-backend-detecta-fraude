@@ -6,6 +6,7 @@ import time
 import urllib.request
 from pathlib import Path
 
+import faiss
 import msgspec
 import numpy as np
 
@@ -19,6 +20,8 @@ FILES = {
 
 RESOURCES = Path("resources")
 DATA = Path("data")
+
+NLIST = 4096
 
 
 class Ref(msgspec.Struct):
@@ -54,6 +57,27 @@ def download_all() -> None:
             )
 
 
+def build_index(vectors: np.ndarray, nlist: int = NLIST) -> faiss.Index:
+    """Treina um índice IVF + quantização escalar de 8 bits sobre os valores."""
+    d = vectors.shape[1]
+    n = vectors.shape[0]
+
+    quantizer = faiss.IndexFlatL2(d)
+    index = faiss.IndexIVFScalarQuantizer(
+        quantizer, d, nlist, faiss.ScalarQuantizer.QT_8bit, faiss.METRIC_L2
+    )
+
+    n_train = min(n, 256 * nlist)
+    rng = np.random.default_rng(0)
+    sample = vectors[rng.choice(n, n_train, replace=False)] if n_train < n else vectors
+
+    print(f"[index] treinando IVF (nlist={nlist}) em {n_train:,} amostras ...")
+    index.train(sample)
+    print(f"[index] adicionando {n:,} vetores ...")
+    index.add(vectors)
+    return index
+
+
 def build_arrays() -> None:
     DATA.mkdir(exist_ok=True)
     gz = RESOURCES / "references.json.gz"
@@ -68,8 +92,7 @@ def build_arrays() -> None:
     print(f" {n:,} vetores parseados em {time.perf_counter() - t0:.1f}s")
 
     print("[transform] montando arrays NumPy ...")
-    vectors = np.array([r.vector for r in refs], dtype=np.float16)
-
+    vectors = np.array([r.vector for r in refs], dtype=np.float32)
     labels = np.fromiter(
         (1 if r.label == "fraud" else 0 for r in refs),
         dtype=np.uint8,
@@ -79,11 +102,12 @@ def build_arrays() -> None:
 
     assert vectors.shape == (n, 14), f"shape inesperado: {vectors.shape}"
 
-    print(f" vetores: {vectors.shape} {vectors.dtype} ({vectors.nbytes / 1e6:.1f} MB)")
+    index = build_index(vectors)
 
-    np.save(DATA / "vectors.f16.npy", vectors)
+    faiss.write_index(index, str(DATA / "index.faiss"))
     np.save(DATA / "labels.u8.npy", labels)
-    print(f"[ok] artefatos salvos em {DATA}/")
+    size = (DATA / "index.faiss").stat().st_size
+    print(f"[ok] índice ({size / 1e6:.0f} MB) e labels salvos em {DATA}/")
 
 
 if __name__ == "__main__":

@@ -11,10 +11,10 @@ from src.search import VectorIndex
 from src.vectorize import FraudRequest, vectorize
 
 _ROOT = Path(__file__).resolve().parent.parent
-_VECTORS = Path(os.environ.get("VECTORS_PATH", _ROOT / "data" / "vectors.f16.npy"))
+_INDEX = Path(os.environ.get("INDEX_PATH", _ROOT / "data" / "index.faiss"))
 _LABELS = Path(os.environ.get("LABELS_PATH", _ROOT / "data" / "labels.u8.npy"))
 
-INDEX = VectorIndex(_VECTORS, _LABELS)
+INDEX = VectorIndex(_INDEX, _LABELS)
 
 _RESPONSES: tuple[bytes, ...] = tuple(
     msgspec.json.encode({"approved": (frauds / 5) < 0.6, "fraud_score": frauds / 5})

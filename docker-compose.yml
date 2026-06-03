@@ -23,10 +23,11 @@ services:
     volumes:
       - sockets:/sockets
     command: >
+      sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
       --uds /sockets/api1.sock --uds-permissions 666
       --workers 1
-      src.app:app
+      src.app:app'
     deploy:
       resources:
         limits:
@@ -35,14 +36,16 @@ services:
 
   # ====== instancia 2 da api =====
   api2:
+    build: .
     image: rinha-fraud:latest
     volumes:
       - sockets:/sockets
     command: >
+      sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi
       --uds /sockets/api2.sock --uds-permissions 666
       --workers 1
-      src.app:app
+      src.app:app'
     depends_on:
       - api1
     deploy:

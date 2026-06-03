@@ -1,7 +1,16 @@
 [project]
 name = "rinha-de-backend-2026"
 version = "0.1.0"
-description = "Add your description here"
+description = "Submissão Python para a Rinha de Backend 2026 (detecção de fraude via k-NN)"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "granian>=2.0",
+    "litestar>=2.0",
+    "msgspec>=0.18",
+    "numpy>=2.0",
+    "hnswlib>=0.8",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.6",]

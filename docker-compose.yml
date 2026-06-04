@@ -34,8 +34,6 @@ services:
       --workers 1 --runtime-threads 2
       --loop uvloop --backlog 4096 --no-ws
       src.app:app'
-    logging:
-      driver: "none"
     ulimits:
       nofile:
         soft: 65535
@@ -61,8 +59,6 @@ services:
       --workers 1 --runtime-threads 2
       --loop uvloop --backlog 4096 --no-ws
       src.app:app'
-    logging:
-      driver: "none"
     ulimits:
       nofile:
         soft: 65535
@@ -75,8 +71,3 @@ services:
 
 volumes:
   sockets:
-    driver: local
-    driver_opts:
-      type: tmpfs
-      device: tmpfs
-      o: "size=4m,uid=0,gid=0,mode=0777"

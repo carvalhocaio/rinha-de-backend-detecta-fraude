@@ -13,10 +13,6 @@ services:
       - api2
     logging:
       driver: "none"
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535
     deploy:
       resources:
         limits:

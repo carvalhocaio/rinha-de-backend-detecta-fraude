@@ -90,21 +90,19 @@ def vectorize(req: FraudRequest) -> np.ndarray:
         minutes_since_last = -1.0
         km_from_last = -1.0
 
-    vec = [
-        _clamp(t.amount / MAX_AMOUNT),  # 0  amount
-        _clamp(t.installments / MAX_INSTALLMENTS),  # 1  installments
-        _clamp((t.amount / c.avg_amount) / AMOUNT_VS_AVG_RATIO),  # 2  amount_vs_avg
-        requested.hour / HOUR_DIVISOR,  # 3  hour_of_day (0-23 já cabe em [0,1])
-        requested.weekday() / DOW_DIVISOR,  # 4  day_of_week (0-6 já cabe em [0,1])
-        minutes_since_last,  # 5  minutes_since_last_tx (-1 se null)
-        km_from_last,  # 6  km_from_last_tx (-1 se null)
-        _clamp(term.km_from_home / MAX_KM),  # 7  km_from_home
-        _clamp(c.tx_count_24h / MAX_TX_COUNT_24H),  # 8  tx_count_24h
-        1.0 if term.is_online else 0.0,  # 9  is_online
-        1.0 if term.card_present else 0.0,  # 10 card_present
-        0.0 if m.id in c.known_merchants else 1.0,  # 11 unknown_merchant (invertido!)
-        _MCC_RISK.get(m.mcc, MCC_DEFAULT_RISK),  # 12 mcc_risk (default se ausente)
-        _clamp(m.avg_amount / MAX_MERCHANT_AVG),  # 13 merchant_avg_amount
-    ]
-
-    return np.asarray(vec, dtype=np.float32)
+    out = np.empty(14, dtype=np.float32)
+    out[0] = _clamp(t.amount / MAX_AMOUNT)
+    out[1] = _clamp(t.installments / MAX_INSTALLMENTS)
+    out[2] = _clamp((t.amount / c.avg_amount) / AMOUNT_VS_AVG_RATIO)
+    out[3] = requested.hour / HOUR_DIVISOR
+    out[4] = requested.weekday() / DOW_DIVISOR
+    out[5] = minutes_since_last
+    out[6] = km_from_last
+    out[7] = _clamp(term.km_from_home / MAX_KM)
+    out[8] = _clamp(c.tx_count_24h / MAX_TX_COUNT_24H)
+    out[9] = 1.0 if term.is_online else 0.0
+    out[10] = 1.0 if term.card_present else 0.0
+    out[11] = 0.0 if m.id in c.known_merchants else 1.0
+    out[12] = _MCC_RISK.get(m.mcc, MCC_DEFAULT_RISK)
+    out[13] = _clamp(m.avg_amount / MAX_MERCHANT_AVG)
+    return out

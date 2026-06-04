@@ -28,7 +28,8 @@ services:
       sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
       --uds /sockets/api1.sock --uds-permissions 666
-      --workers 1
+      --workers 1 --threads 2
+      --loop uvloop --backlog 4096
       src.app:app'
     deploy:
       resources:
@@ -48,10 +49,9 @@ services:
       sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi
       --uds /sockets/api2.sock --uds-permissions 666
-      --workers 1
+      --workers 1 --threads 2
+      --loop uvloop --backlog 4096
       src.app:app'
-    depends_on:
-      - api1
     deploy:
       resources:
         limits:

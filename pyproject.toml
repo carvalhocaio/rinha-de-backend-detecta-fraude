@@ -10,6 +10,7 @@ dependencies = [
     "litestar>=2.0",
     "msgspec>=0.18",
     "numpy>=2.0",
+    "uvloop>=0.21",
 ]
 
 [dependency-groups]

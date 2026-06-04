@@ -24,6 +24,7 @@ class VectorIndex:
             nprobe if nprobe is not None else os.environ.get("FAISS_NPROBE", 16)
         )
 
+        self.index.nprobe = self.nprobe  # type: ignore[assignment]
         self.labels = np.load(labels_path, mmap_mode="r")
         self.n = self.index.ntotal
 

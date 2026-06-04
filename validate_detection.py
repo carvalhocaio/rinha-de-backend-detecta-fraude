@@ -99,5 +99,5 @@ if cut:
 else:
     print(f"  rate_component         : {rate_component:+9.2f}")
     print(f"  absolute_penalty       : {absolute_penalty:+9.2f}")
-print(f"  -> detection_score      : {score_det:+9.2f}")
+print(f"  -> detection_score     : {score_det:+9.2f}")
 print("=" * 60)

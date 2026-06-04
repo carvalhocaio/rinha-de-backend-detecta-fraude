@@ -27,6 +27,8 @@ services:
       - sockets:/sockets
     environment:
       - FAISS_NPROBE=${FAISS_NPROBE:-16}
+      - OMP_NUM_THREADS=1
+      - OPENBLAS_NUM_THREADS=1
     command: >
       sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
@@ -52,6 +54,8 @@ services:
       - sockets:/sockets
     environment:
       - FAISS_NPROBE=${FAISS_NPROBE:-16}
+      - OMP_NUM_THREADS=1
+      - OPENBLAS_NUM_THREADS=1
     command: >
       sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi

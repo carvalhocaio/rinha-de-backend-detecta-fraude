@@ -1,0 +1,86 @@
+services:
+  # ===== load balancer =====
+  haproxy:
+    image: haproxy:3.0-alpine
+    platform: linux/amd64
+    ports:
+      - "9999:9999"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - sockets:/sockets
+    depends_on:
+      - api1
+      - api2
+    logging:
+      driver: "none"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "16M"
+
+  # ===== instancia 1 da api =====
+  api1:
+    image: ghcr.io/carvalhocaio/rinha-fraud:latest
+    platform: linux/amd64
+    volumes:
+      - sockets:/sockets
+    environment:
+      - FAISS_NPROBE=${FAISS_NPROBE:-16}
+    command: >
+      sh -c 'rm -f /sockets/api1.sock &&
+      granian --interface asgi
+      --uds /sockets/api1.sock --uds-permissions 666
+      --workers 1 --runtime-threads 2
+      --loop uvloop --backlog 4096 --no-ws
+      src.app:app'
+    logging:
+      driver: "none"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "167M"
+
+  # ====== instancia 2 da api =====
+  api2:
+    image: ghcr.io/carvalhocaio/rinha-fraud:latest
+    platform: linux/amd64
+    volumes:
+      - sockets:/sockets
+    environment:
+      - FAISS_NPROBE=${FAISS_NPROBE:-16}
+    command: >
+      sh -c 'rm -f /sockets/api2.sock &&
+      granian --interface asgi
+      --uds /sockets/api2.sock --uds-permissions 666
+      --workers 1 --runtime-threads 2
+      --loop uvloop --backlog 4096 --no-ws
+      src.app:app'
+    logging:
+      driver: "none"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "167M"
+
+volumes:
+  sockets:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "size=4m,uid=0,gid=0,mode=0777"

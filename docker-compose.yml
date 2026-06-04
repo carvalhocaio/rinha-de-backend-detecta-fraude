@@ -22,6 +22,8 @@ services:
     image: rinha-fraud:latest
     volumes:
       - sockets:/sockets
+    environment:
+      - FAISS_NPROBE=${FAISS_NPROBE:-16}
     command: >
       sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
@@ -40,6 +42,8 @@ services:
     image: rinha-fraud:latest
     volumes:
       - sockets:/sockets
+    environment:
+      - FAISS_NPROBE=${FAISS_NPROBE:-16}
     command: >
       sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi

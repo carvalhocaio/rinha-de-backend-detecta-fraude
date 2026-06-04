@@ -13,6 +13,7 @@ RUN uv sync --frozen --no-dev
 
 COPY src/ ./src/
 RUN uv run --no-dev python -m src.preprocess
+RUN uv run --no-dev python -m compileall -q .venv/lib/python3.13/site-packages/ src/
 
 # ============ runtime =============
 FROM python:3.13-slim AS runtime

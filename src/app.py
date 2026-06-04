@@ -4,8 +4,10 @@ import os
 from pathlib import Path
 
 import msgspec
-from litestar import Litestar, Response, get, post
-from litestar.enums import MediaType
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import Response
+from starlette.routing import Route
 
 from src.search import VectorIndex
 from src.vectorize import FraudRequest, vectorize
@@ -22,21 +24,23 @@ _RESPONSES: tuple[bytes, ...] = tuple(
 )
 
 
-@get("/ready", media_type=MediaType.TEXT, sync_to_thread=False)
-def ready() -> str:
-    return "ok"
+async def ready(request: Request) -> Response:
+    return Response("ok", media_type="text/plain")
 
 
-@post("/fraud-score", media_type=MediaType.JSON, sync_to_thread=False)
-def fraud_score(data: FraudRequest) -> Response[bytes]:
+async def fraud_score(request: Request) -> Response:
     try:
+        body = await request.body()
+        data = msgspec.json.decode(body, type=FraudRequest)
         query = vectorize(data)
         frauds = int(INDEX.labels[INDEX.knn(query, k=5)].sum())
-        body = _RESPONSES[frauds]
+        resp_body = _RESPONSES[frauds]
     except Exception:
-        body = _RESPONSES[0]
+        resp_body = _RESPONSES[0]
+    return Response(resp_body, media_type="application/json")
 
-    return Response(body, media_type=MediaType.JSON, status_code=200)
 
-
-app = Litestar(route_handlers=[ready, fraud_score])
+app = Starlette(routes=[
+    Route("/ready", ready),
+    Route("/fraud-score", fraud_score, methods=["POST"]),
+])

@@ -1,0 +1,7 @@
+data/
+resources/
+src/
+test/
+__pycache__/
+*.pyc
+.venv/

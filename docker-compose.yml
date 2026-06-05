@@ -11,8 +11,6 @@ services:
     depends_on:
       - api1
       - api2
-    logging:
-      driver: "none"
     deploy:
       resources:
         limits:

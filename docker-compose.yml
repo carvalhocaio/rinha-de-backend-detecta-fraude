@@ -19,7 +19,7 @@ services:
 
   # ===== instancia 1 da api =====
   api1:
-    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:ceb547b30e0b45512a82c22bf7ad3bd7e2ff3d401e0d299d94c1ee647e9d5744
+    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:8fb9e4ce4bab6bc98a0d62d0ffca5c5ca34de4c526f81a99512f3d40d32d0d20
     platform: linux/amd64
     volumes:
       - sockets:/sockets
@@ -46,7 +46,7 @@ services:
 
   # ====== instancia 2 da api =====
   api2:
-    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:ceb547b30e0b45512a82c22bf7ad3bd7e2ff3d401e0d299d94c1ee647e9d5744
+    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:8fb9e4ce4bab6bc98a0d62d0ffca5c5ca34de4c526f81a99512f3d40d32d0d20
     platform: linux/amd64
     volumes:
       - sockets:/sockets

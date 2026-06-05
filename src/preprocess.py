@@ -58,13 +58,18 @@ def download_all() -> None:
 
 
 def build_index(vectors: np.ndarray, nlist: int = NLIST) -> faiss.Index:
-    """Treina um índice IVF + quantização escalar de 8 bits sobre os valores."""
+    """Treina um índice IVF + quantização escalar fp16 sobre os valores.
+
+    fp16 (16 bits) preserva precisão suficiente para casar com a busca exata
+    do gabarito (detection ceiling ~+2790), enquanto o antigo QT_8bit distorcia
+    as distâncias e limitava a detecção a ~+2317 mesmo com recall alto.
+    """
     d = vectors.shape[1]
     n = vectors.shape[0]
 
     quantizer = faiss.IndexFlatL2(d)
     index = faiss.IndexIVFScalarQuantizer(
-        quantizer, d, nlist, faiss.ScalarQuantizer.QT_8bit, faiss.METRIC_L2
+        quantizer, d, nlist, faiss.ScalarQuantizer.QT_fp16, faiss.METRIC_L2
     )
 
     n_train = min(n, 256 * nlist)

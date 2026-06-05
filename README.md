@@ -4,7 +4,7 @@ Implementação Python para o desafio de detecção de fraude da Rinha de Backen
 
 ## Endpoints
 
-- `GET /ready` — health check; retorna 200 quando a API está pronta
+- `GET /ready` — health check; retorna `503` enquanto o índice FAISS carrega e `200` quando a API está pronta
 - `POST /fraud-score` — recebe os dados da transação e retorna `approved` e `fraud_score`
 
 ## Como funciona
@@ -16,7 +16,7 @@ Cada requisição é transformada em um vetor de 14 dimensões conforme a especi
 | Camada | Tecnologia |
 |---|---|
 | Runtime | Python 3.13 |
-| Web framework | Litestar |
+| Aplicação | ASGI puro (sem framework) |
 | ASGI server | Granian + uvloop |
 | Serialização | msgspec |
 | Busca vetorial | FAISS IVF (SQ8) |
@@ -24,6 +24,8 @@ Cada requisição é transformada em um vetor de 14 dimensões conforme a especi
 | Empacotamento | uv + Docker multi-stage |
 
 Recursos: 1 CPU core total, 350 MB RAM total (conforme limite da Rinha).
+
+O índice FAISS é carregado em uma thread de background durante a inicialização, de modo que o socket do Granian fica disponível imediatamente — `/ready` responde `503` até o índice estar pronto, evitando timeouts de health check em ambientes com CPU limitada.
 
 ## Como rodar localmente
 

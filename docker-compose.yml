@@ -21,7 +21,7 @@ services:
 
   # ===== instancia 1 da api =====
   api1:
-    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:1be43b31251d198acb667d7d64907c6cd9e90fa623948639f52ba59d309c3cd6
+    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:ceb547b30e0b45512a82c22bf7ad3bd7e2ff3d401e0d299d94c1ee647e9d5744
     platform: linux/amd64
     volumes:
       - sockets:/sockets
@@ -33,7 +33,7 @@ services:
       sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
       --uds /sockets/api1.sock --uds-permissions 666
-      --workers 1 --runtime-threads 2
+      --workers 1 --runtime-threads 1
       --loop uvloop --backlog 4096 --no-ws
       src.app:app'
     ulimits:
@@ -48,7 +48,7 @@ services:
 
   # ====== instancia 2 da api =====
   api2:
-    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:1be43b31251d198acb667d7d64907c6cd9e90fa623948639f52ba59d309c3cd6
+    image: ghcr.io/carvalhocaio/rinha-fraud@sha256:ceb547b30e0b45512a82c22bf7ad3bd7e2ff3d401e0d299d94c1ee647e9d5744
     platform: linux/amd64
     volumes:
       - sockets:/sockets
@@ -60,7 +60,7 @@ services:
       sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi
       --uds /sockets/api2.sock --uds-permissions 666
-      --workers 1 --runtime-threads 2
+      --workers 1 --runtime-threads 1
       --loop uvloop --backlog 4096 --no-ws
       src.app:app'
     ulimits:

@@ -24,7 +24,7 @@ services:
     volumes:
       - sockets:/sockets
     environment:
-      - FAISS_NPROBE=${FAISS_NPROBE:-8}
+      - FAISS_NPROBE=${FAISS_NPROBE:-4}
       - OMP_NUM_THREADS=1
       - OPENBLAS_NUM_THREADS=1
     command: >
@@ -51,7 +51,7 @@ services:
     volumes:
       - sockets:/sockets
     environment:
-      - FAISS_NPROBE=${FAISS_NPROBE:-8}
+      - FAISS_NPROBE=${FAISS_NPROBE:-4}
       - OMP_NUM_THREADS=1
       - OPENBLAS_NUM_THREADS=1
     command: >

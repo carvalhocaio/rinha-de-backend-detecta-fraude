@@ -23,7 +23,7 @@ services:
     volumes:
       - sockets:/sockets
     environment:
-      - FAISS_NPROBE=${FAISS_NPROBE:-16}
+      - FAISS_NPROBE=${FAISS_NPROBE:-8}
     command: >
       sh -c 'rm -f /sockets/api1.sock &&
       granian --interface asgi
@@ -44,7 +44,7 @@ services:
     volumes:
       - sockets:/sockets
     environment:
-      - FAISS_NPROBE=${FAISS_NPROBE:-16}
+      - FAISS_NPROBE=${FAISS_NPROBE:-8}
     command: >
       sh -c 'rm -f /sockets/api2.sock &&
       granian --interface asgi
